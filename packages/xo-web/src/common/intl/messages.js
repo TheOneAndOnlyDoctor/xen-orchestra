@@ -322,6 +322,7 @@ const messages = {
   editBackupSmartTags: 'Tags',
   sampleOfMatchingVms: 'Sample of matching Vms',
   editBackupSmartTagsTitle: 'VMs Tags',
+  editBackupSmartNoTagsTitle: 'VMs not contain Tags',
   editBackupNot: 'Reverse',
   editBackupTagTitle: 'Tag',
   editBackupReportTitle: 'Report',
