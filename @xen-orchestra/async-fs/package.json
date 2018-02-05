@@ -1,21 +1,12 @@
 {
-  "name": "@xen-orchestra/cron",
-  "version": "0.2.0",
+  "private": true,
+  "name": "@xen-orchestra/async-fs",
+  "version": "0.0.0",
   "license": "ISC",
-  "description": "Focused, well maintained, cron parser/scheduler",
-  "keywords": [
-    "cron",
-    "cronjob",
-    "crontab",
-    "job",
-    "parser",
-    "pattern",
-    "schedule",
-    "scheduling",
-    "task"
-  ],
-  "homepage": "https://github.com/vatesfr/xen-orchestra/tree/master/packages/@xen-orchestra/cron",
-  "bugs": "https://github.com/vatesfr/xen-orchestra/issues",
+  "description": "",
+  "keywords": [],
+  "homepage": "https://github.com/vatesfr/xen-orchestra/tree/master/packages/@xen-orchestra/async-fs",
+  "bugs": "https://github.com/vatesfr/xo-web/issues",
   "repository": {
     "type": "git",
     "url": "https://github.com/vatesfr/xen-orchestra.git"
@@ -31,17 +22,17 @@
     "dist/"
   ],
   "engines": {
-    "node": ">=6"
+    "node": ">=4"
   },
   "dependencies": {
-    "lodash": "^4.17.4",
-    "luxon": "^0.4.0"
+    "promise-toolbox": "^0.9.5"
   },
   "devDependencies": {
     "@babel/cli": "7.0.0-beta.39",
     "@babel/core": "7.0.0-beta.39",
     "@babel/preset-env": "7.0.0-beta.39",
     "@babel/preset-flow": "7.0.0-beta.39",
+    "babel-plugin-lodash": "^3.3.2",
     "cross-env": "^5.1.3",
     "rimraf": "^2.6.2"
   },
