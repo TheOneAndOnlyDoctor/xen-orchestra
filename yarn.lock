@@ -403,7 +403,7 @@
     "@babel/helper-regex" "7.0.0-beta.39"
     regexpu-core "^4.1.3"
 
-"@babel/polyfill@7.0.0-beta.39", "@babel/polyfill@^7.0.0-beta.36":
+"@babel/polyfill@7.0.0-beta.39":
   version "7.0.0-beta.39"
   resolved "https://registry.yarnpkg.com/@babel/polyfill/-/polyfill-7.0.0-beta.39.tgz#3711a88b11f5982b936d5a60f239410ce75c6529"
   dependencies:
@@ -11326,12 +11326,6 @@ validate-npm-package-license@^3.0.1:
   dependencies:
     spdx-correct "~1.0.0"
     spdx-expression-parse "~1.0.0"
-
-value-matcher@^0.0.0:
-  version "0.0.0"
-  resolved "https://registry.yarnpkg.com/value-matcher/-/value-matcher-0.0.0.tgz#c0caf87dc3998a68ea56b31fd1916adefe39f7be"
-  dependencies:
-    "@babel/polyfill" "^7.0.0-beta.36"
 
 value-or-function@^3.0.0:
   version "3.0.0"
