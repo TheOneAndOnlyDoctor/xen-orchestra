@@ -1,52 +1,69 @@
-#!/bin/sh
+#!/usr/bin/env node
 
-set -eu
+const defer = require('golike-defer').default
+const { execFile } = require('child_process')
+const { fromCallback } = require('promise-toolbox')
 
-format_files () {
-  prettier --write "$@"
-  eslint --ignore-pattern '!*' --fix "$@"
-}
-test_files () {
-  jest --findRelatedTests --passWithNoTests "$@"
-}
+const { readFile, run, writeFile } = require('./utils')
 
-# compute the list of staged files we are interested in
-set --
-buf=$(mktemp -u)
-git diff-index --cached --diff-filter=AM --name-only HEAD > "$buf"
-while IFS= read -r file
-do
-  case "$file" in
-    *.js)
-      set -- "$@" "$file";;
-  esac
-done < "$buf"
-rm -f "$buf"
+const git = args => fromCallback(cb => execFile('git', args, cb))
 
-if [ $# -eq 0 ]
-then
-  exit
-fi
+const gitDiff = (what, args = []) =>
+  git(
+    [
+      'diff-' + what,
+      '--diff-filter=AM',
+      '--ignore-submodules',
+      '--name-only',
+    ].concat(args)
+  ).then(stdout => stdout.split('\n').filter(_ => _ !== ''))
+const gitDiffFiles = (files = []) => gitDiff('files', files)
+const gitDiffIndex = () => gitDiff('index', ['--cached', 'HEAD'])
 
-format_files "$@"
+const formatFiles = files =>
+  run('./node_modules/.bin/prettier', ['--write'].concat(files)).then(() =>
+    run(
+      './node_modules/.bin/eslint',
+      ['--ignore-pattern', '!*', '--fix'].concat(files)
+    )
+  )
+const testFiles = files =>
+  run(
+    './node_modules/.bin/jest',
+    ['--findRelatedTests', '--passWithNoTests'].concat(files)
+  )
 
-# stash unstaged changes
-if stash=$(git stash create --keep-index --quiet)
-then
-  # remove those changes from the worktree
-  git checkout .
+require('exec-promise')(
+  defer(async $defer => {
+    let files = await gitDiffIndex()
+    files = files.filter(_ => _.endsWith('.js'))
+    if (files.length === 0) {
+      return
+    }
 
-  format_files "$@"
+    // save the list of files with unstaged changes
+    let unstaged = await gitDiffFiles(files)
 
-  # unstash on exit
-  on_exit () {
-    git read-tree HEAD
-    git checkout $stash "$@"
-  }
-  trap 'GIT_INDEX_FILE=$buf on_exit "$@"; rm -f "$buf"' EXIT
-fi
+    // format all files
+    await formatFiles(files)
 
-test_files "$@"
+    if (unstaged.length !== 0) {
+      // refresh the list of files with unstaged changes, maybe the
+      // changes have been reverted by the formatting
+      unstaged = await gitDiffFiles(unstaged)
 
-# add any changes made by the commands
-git add "$@"
+      if (unstaged.length !== 0) {
+        const contents = await Promise.all(unstaged.map(readFile))
+        $defer(() =>
+          Promise.all(unstaged.map((name, i) => writeFile(name, contents[i])))
+        )
+        await git(['checkout'].concat(unstaged))
+        await formatFiles(unstaged)
+      }
+    }
+
+    await testFiles(files)
+
+    await git(['add'].concat(files))
+  })
+)

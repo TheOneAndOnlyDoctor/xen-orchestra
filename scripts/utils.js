@@ -1,4 +1,4 @@
-const { forEach, fromCallback } = require('promise-toolbox')
+const { forEach, fromCallback, fromEvent } = require('promise-toolbox')
 const fs = require('fs')
 
 const ROOT_DIR = `${__dirname}/..`
@@ -39,6 +39,25 @@ const noop = (exports.noop = () => {})
 
 const readFile = (exports.readFile = file =>
   fromCallback(cb => fs.readFile(file, 'utf8', cb)))
+
+exports.run = (command, args, opts) =>
+  fromEvent(
+    require('child_process').spawn(
+      command,
+      args,
+      Object.assign(
+        {
+          stdio: 'inherit',
+        },
+        opts
+      )
+    ),
+    'exit'
+  ).then(code => {
+    if (code !== 0) {
+      throw code
+    }
+  })
 
 exports.unlink = path =>
   fromCallback(cb => fs.unlink(path, cb)).catch(error => {
